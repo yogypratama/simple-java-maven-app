@@ -1,5 +1,8 @@
 node {
-    docker.image('maven:3.9.0').inside('-v /root/.m2:/root/.m2') {
+    docker.image('maven:3.9.0').inside('-v /root/.m2:/root/.m2').inside('-u 0.0') {
+        environment {
+            PUBLIC_URL = 'https://dbs-java-app.web.app'
+        }
         stage('Build') { 
             sh 'mvn -B -DskipTests clean package'
         }
@@ -15,6 +18,7 @@ node {
         stage('Deploy') {
             sh './jenkins/scripts/deliver.sh'
             sleep(time: 1, unit: 'MINUTES')
+            sh './jenkins/scripts/deploy-to-firebase.sh'
         }
     }
 }
