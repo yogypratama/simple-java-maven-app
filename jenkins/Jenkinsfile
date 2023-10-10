@@ -1,8 +1,5 @@
 node {
-    docker.image('maven:3.9.0').inside('-v /root/.m2:/root/.m2').inside('-u 0.0') {
-        environment {
-            PUBLIC_URL = 'https://dbs-java-app.web.app'
-        }
+    docker.image('maven:3.9.0').inside('-v /root/.m2:/root/.m2') {
         stage('Build') { 
             sh 'mvn -B -DskipTests clean package'
         }
@@ -12,13 +9,8 @@ node {
                 junit 'target/surefire-reports/*.xml'
             }
         }
-        stage('Manual Approval') {
-            input message: 'Lanjutkan ke tahap Deploy?'
-        }
-        stage('Deploy') {
+        stage('Deliver') {
             sh './jenkins/scripts/deliver.sh'
-            sleep(time: 1, unit: 'MINUTES')
-            sh './jenkins/scripts/deploy-to-firebase.sh'
         }
     }
 }
